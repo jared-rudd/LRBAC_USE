@@ -1,0 +1,132 @@
+model RBAC
+
+-- CLASSES
+
+class User
+attributes
+  userID : String
+operations
+  CreateSession(s : Session)
+  DeleteSession(s : Session)
+  AssignRole(r : Role)
+  DeassignRole(r: Role)
+  AssignedRoles() : Set(Role)
+  AuthorizedRoles() : Set(Role)
+end
+
+class Role
+attributes
+  name : String
+operations
+  GrantPermission(p : Permission)
+  RevokePermission(p : Permission)
+  CheckAccess(obj : Object, op : Operation) : Boolean
+  AddAscendant(r : Role)
+  DeleteAscendant(r : Role)
+  AddDescendant(r : Role)
+  DeleteDescendant(r : Role)
+  AddSSDRole(r : Role)
+  DeleteSSDRole(r : Role)
+  AddDSDRole(r : Role)
+  DeleteDSDRole(r : Role)
+  AssignedUsers() : Set(User)
+  AuthorizedUsers() : Set(User)
+  Ascendants() : Set(Role)
+  Descendants() : Set(Role)
+  SSDRoles() : Set(Role)
+  DSDRoles() : Set(Role)
+end
+
+class Session
+attributes
+  sessionID : String
+operations
+  AddActiveRole(r : Role)
+  DropActiveRole(r : Role)
+  CheckAccess(obj : Object, op : Operation) : Boolean
+  InvokeOperation(obj : Object, op : Operation)
+end
+
+class Permission
+attributes
+  name : String
+operations
+  CheckAccess(obj : Object, op : Operation) : Boolean
+end
+
+class Object
+attributes
+  name : String
+end
+
+class Operation
+attributes
+  name : String
+end
+
+class SSDRole
+attributes
+  name : String
+end
+
+class DSD
+attributes
+  name : String
+end
+
+class PrerequisiteRole
+attributes
+  name : String
+end
+
+-- ASSOCIATIONS
+
+association UserAssignment between
+  User[0..*] role users
+  Role[0..*] role roles
+end
+
+association UserSessions between
+  User[1] role user
+  Session[0..*] role sessions
+end
+
+association SessionRoles between
+  Session[0..*] role sessions
+  Role[0..*] role activeRoles
+end
+
+association RoleHierarchy between
+  Role[0..*] role senior
+  Role[0..*] role junior
+end
+
+association PermAssignment between
+  Role[0..*] role roles
+  Permission[0..*] role permissions
+end
+
+association PermObjects between
+  Permission[0..*] role permissions
+  Object[0..*] role objects
+end
+
+association PermOperations between
+  Permission[0..*] role permissions
+  Operation[0..*] role operationss
+end
+
+association SSDConstraint between
+  SSDRole[1] role ssdConstraint
+  Role[2] role roles
+end
+
+association DSDConstraint between
+  DSD[1] role dsdConstraint
+  Role[2] role roles
+end
+
+association PrereqRoles between
+  PrerequisiteRole[1] role prereqConstraint
+  Role[2] role roles
+end
