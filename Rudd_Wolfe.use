@@ -1,7 +1,5 @@
 model RBAC
 
--- Checkpoint 2: Classes, Associations, Constraints (Per Ray et al.)
-
 -- CLASSES
 
 class User
@@ -36,7 +34,7 @@ operations
   DeleteDSDRole(r : Role)
   AssignedUsers() : Set(User) = self.users
   AuthorizedUsers() : Set(User) = 
-    self.users->union(self.senior.users)->asSet()
+    self.users->union(self.Ascendants().users)->asSet()
   Ascendants()  : Set(Role) =
     self.senior->union(self.senior->collect(r | r.Ascendants()))->asSet()
   Descendants() : Set(Role) =
@@ -128,12 +126,12 @@ end
 
 association PermObjects between
   Permission[0..*] role permissions
-  Object[0..*] role objects
+  Object[1..*] role objects
 end
 
 association PermOperations between
   Permission[0..*] role permissions
-  Operation[0..*] role ops
+  Operation[1..*] role ops
 end
 
 association SSDConstraint between
