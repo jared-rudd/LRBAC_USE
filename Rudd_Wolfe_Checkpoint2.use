@@ -1,5 +1,7 @@
 model RBAC
 
+-- Checkpoint 2: Classes, Associations, Constraints (Per Ray et al.)
+
 -- CLASSES
 
 class User
