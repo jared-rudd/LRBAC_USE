@@ -12,8 +12,9 @@ operations
   DeleteSession(s : Session)
   AssignRole(r : Role)
   DeassignRole(r: Role)
-  AssignedRoles() : Set(Role)
-  AuthorizedRoles() : Set(Role)
+  AssignedRoles() : Set(Role) = self.roles
+  AuthorizedRoles() : Set(Role) =
+    self.roles->union(self.roles->collect(ro | ro.Descendants()))->asSet()
 end
 
 class Role
@@ -23,7 +24,8 @@ attributes
 operations
   GrantPermission(p : Permission)
   RevokePermission(p : Permission)
-  CheckAccess(obj : Object, op : Operation) : Boolean
+  CheckAccess(obj : Object, op : Operation) : Boolean =
+    self.permissions->exists(p | p.objects->includes(obj) and p.ops->includes(op))
   AddAscendant(r : Role)
   DeleteAscendant(r : Role)
   AddDescendant(r : Role)
@@ -32,12 +34,23 @@ operations
   DeleteSSDRole(r : Role)
   AddDSDRole(r : Role)
   DeleteDSDRole(r : Role)
-  AssignedUsers() : Set(User)
-  AuthorizedUsers() : Set(User)
-  Ascendants() : Set(Role)
-  Descendants() : Set(Role)
-  SSDRoles() : Set(Role)
-  DSDRoles() : Set(Role)
+  AssignedUsers() : Set(User) = self.users
+  AuthorizedUsers() : Set(User) = 
+    self.users->union(self.senior.users)->asSet()
+  Ascendants()  : Set(Role) =
+    self.senior->union(self.senior->collect(r | r.Ascendants()))->asSet()
+  Descendants() : Set(Role) =
+    self.junior->union(self.junior->collect(r | r.Descendants()))->asSet()
+  SSDRoles() : Set(Role) = 
+    if self.ssdConstraint->isEmpty
+      then oclEmpty(Set(Role))
+    else self.ssdConstraint.roles->asSet()
+    endif
+  DSDRoles() : Set(Role) =
+    if self.dsdConstraint->isEmpty
+      then oclEmpty(Set(Role))
+    else self.dsdConstraint.roles->asSet()
+    endif
 end
 
 class Session
@@ -56,7 +69,8 @@ class Permission
 attributes
   name : String
 operations
-  CheckAccess(obj : Object, op : Operation) : Boolean
+  CheckAccess(obj : Object, op : Operation) : Boolean =
+    self.objects->includes(obj) and self.ops->includes(op)
 end
 
 class Object
@@ -247,3 +261,35 @@ inv MustHaveObject:
   self.objects->size() >= 1
 inv MustHaveOperation: 
   self.ops->size() >= 1
+
+context Role::AddAscendant(r : Role)
+pre: not self.senior->includes(r)
+post: self.senior = self.senior@pre->including(r)
+
+context Role::DeleteAscendant(r : Role)
+pre: self.senior->includes(r)
+post: self.senior = self.senior@pre->excluding(r)
+
+context Role::AddDescendant(r : Role)
+pre: not self.junior->includes(r)
+post: self.junior = self.junior@pre->including(r)
+
+context Role::DeleteDescendant(r : Role)
+pre: self.junior->includes(r)
+post: self.junior = self.junior@pre->excluding(r)
+
+context Role::AddSSDRole(r : Role)
+pre: not self.SSDRoles()->includes(r)
+post: self.ssdConstraint.roles = self.ssdConstraint.roles@pre->including(r)
+
+context Role::DeleteSSDRole(r : Role)
+pre: self.SSDRoles()->includes(r)
+post: self.ssdConstraint.roles = self.ssdConstraint.roles@pre->excluding(r)
+
+context Role::AddDSDRole(r : Role)
+pre: not self.DSDRoles()->includes(r)
+post: self.dsdConstraint.roles = self.dsdConstraint.roles@pre->including(r)
+
+context Role::DeleteDSDRole(r : Role)
+pre: self.DSDRoles()->includes(r)
+post: self.dsdConstraint.roles = self.dsdConstraint.roles@pre->excluding(r)
