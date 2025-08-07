@@ -135,32 +135,32 @@ association PermOperations between
 end
 
 association SSDConstraint between
-  SSDRole[1] role ssdConstraint
+  SSDRole[0..1] role ssdConstraint
   Role[2] role roles
 end
 
 association DSDConstraint between
-  DSD[1] role dsdConstraint
+  DSD[0..1] role dsdConstraint
   Role[2] role roles
 end
 
 association PrereqRoles between
-  PrerequisiteRole[1] role prereqConstraint
+  PrerequisiteRole[0..1] role prereqConstraint
   Role[2] role roles
 end
 
 association SSDPermConstraint between
-  SSDPerm[1] role ssdPermConstraint
+  SSDPerm[0..1] role ssdPermConstraint
   Permission[2] role perms
 end
 
 association SSDUserConstraint between
-  SSDUser[1] role ssdUserConstraint
+  SSDUser[0..1] role ssdUserConstraint
   User[2] role users
 end
 
 association PrereqPerms between
-  PrerequisitePerm[1] role prereqPermConstraint
+  PrerequisitePerm[0..1] role prereqPermConstraint
   Permission[2] role perms
 end
 
