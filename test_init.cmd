@@ -96,3 +96,5 @@
 !create oliver : User
 !set oliver.userID := 'oliver'
 !insert (oliver, pcChair) into UserAssignment
+
+check

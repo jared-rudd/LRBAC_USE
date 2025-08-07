@@ -60,7 +60,8 @@ operations
   CheckAccess(obj : Object, op : Operation) : Boolean = 
     self.activeRoles->collect(ro | ro.permissions)->asSet()->exists(p |
       p.objects->includes(obj) and p.ops->includes(op))
-  InvokeOperation(obj : Object, op : Operation)
+  InvokeOperation(obj : Object, op : Operation) : Boolean =
+    self.CheckAccess(obj, op)
 end
 
 class Permission
@@ -250,9 +251,9 @@ context Session::DropActiveRole(r : Role)
 pre:  self.activeRoles->includes(r)
 post: self.activeRoles = self.activeRoles@pre->excluding(r)
 
-context Session::InvokeOperation(obj : Object, op : Operation)
+context Session::InvokeOperation(obj : Object, op : Operation) : Boolean
 pre:  self.CheckAccess(obj, op)
-post: true
+post: result = self.CheckAccess(obj, op)
 
 context Permission
 inv MustHaveObject:   

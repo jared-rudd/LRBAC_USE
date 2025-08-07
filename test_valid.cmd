@@ -1,44 +1,24 @@
--- Opens the class diagram:
--- open examples/Documentation/Demo/Demo.use
+-- Author would write a paper
+!create s_author : Session
+!set s_author.sessionID := 'session_author'
+!insert (jared , s_author)  into UserSessions
+!insert (s_author, author) into SessionRoles
 
--- Creates the object diagram:
--- read examples/Documentation/Demo/Demo.cmd
+-- Reviewer would write a review
+!create s_rev : Session
+!set s_rev.sessionID := 'session_reviewer'
+!insert (paul, s_rev) into UserSessions
+!insert (s_rev, reviewer) into SessionRoles
 
--- Department
-!create cs:Department
-!set cs.name := 'Computer Science'
-!set cs.location := 'Bremen'
-!set cs.budget := 10000
+-- PC-Chair would decide the paper
+!create s_chair : Session
+!set s_chair.sessionID := 'session_chair'
+!insert (oliver, s_chair) into UserSessions
+!insert (s_chair, pcChair) into SessionRoles
 
--- Employee john
-!create john : Employee
-!set john.name := 'john'
-!set john.salary := 4000
+-- Evaluate in USE GUI, all should be 'true : Boolean'
+-- s_author.InvokeOperation(paper1, opWritePaper)
+-- s_rev.InvokeOperation(paper1, opWriteReview)
+-- s_chair.InvokeOperation(paper1, opDecidePaper)
 
--- Employee frank
-!create frank : Employee
-!set frank.name := 'frank'
-!set frank.salary := 4500
-
--- WorksIn
-!insert (john,cs) into WorksIn
-!insert (frank,cs) into WorksIn
-
--- Project research
-!create research : Project
-!set research.name := 'Research'
-!set research.budget := 12000
-
--- Project teaching
-!create teaching : Project
-!set teaching.name := 'Validating UML'
-!set teaching.budget := 3000
-
--- Controls
-!insert (cs,research) into Controls
-!insert (cs,teaching) into Controls
-
--- WorksOn
-!insert (frank,research) into WorksOn
-!insert (frank,teaching) into WorksOn
-!insert (john,research) into WorksOn
+check
